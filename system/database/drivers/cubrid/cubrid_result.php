@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
@@ -25,8 +25,6 @@
  * @filesource
  */
 
-// --------------------------------------------------------------------
-
 /**
  * CUBRID Result Class
  *
@@ -41,10 +39,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	/**
 	 * Number of rows in the result set
 	 *
-	 * @access	public
 	 * @return	integer
 	 */
-	function num_rows()
+	public function num_rows()
 	{
 		return @cubrid_num_rows($this->result_id);
 	}
@@ -54,10 +51,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	/**
 	 * Number of fields in the result set
 	 *
-	 * @access	public
 	 * @return	integer
 	 */
-	function num_fields()
+	public function num_fields()
 	{
 		return @cubrid_num_fields($this->result_id);
 	}
@@ -69,10 +65,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 *
 	 * Generates an array of column names
 	 *
-	 * @access	public
 	 * @return	array
 	 */
-	function list_fields()
+	public function list_fields()
 	{
 		return cubrid_column_names($this->result_id);
 	}
@@ -84,22 +79,21 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 *
 	 * Generates an array of objects containing field meta-data
 	 *
-	 * @access	public
 	 * @return	array
 	 */
-	function field_data()
+	public function field_data()
 	{
 		$retval = array();
 		$colIdx = 0;
 
 		while ($field = @cubrid_fetch_field($this->result_id))
 		{
-			$F              = new stdClass();
-			$F->name        = $field->name;
+			$F		= new stdClass();
+			$F->name		= $field->name;
 			// CUBRID returns type as varchar(100) for example,
 			// that's why we need to remove all brackets and digits.
-			$F->type        = preg_replace('/[\d()]/', '', $field->type);
-			$F->default     = $field->def;
+			$F->type		= preg_replace('/[\d()]/', '', $field->type);
+			$F->default	= $field->def;
 			// use CUBRID's native API to obtain column's max_length,
 			// otherwise $field->max_length returns incorrect info.
 			// See #150.
@@ -119,7 +113,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 *
 	 * @return	null
 	 */
-	function free_result()
+	public function free_result()
 	{
 		if(is_resource($this->result_id) ||
 			get_resource_type($this->result_id) == "Unknown" &&
@@ -139,10 +133,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 * this internally before fetching results to make sure the
 	 * result set starts at zero
 	 *
-	 * @access	private
 	 * @return	array
 	 */
-	function _data_seek($n = 0)
+	protected function _data_seek($n = 0)
 	{
 		return cubrid_data_seek($this->result_id, $n);
 	}
@@ -154,10 +147,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 *
 	 * Returns the result set as an array
 	 *
-	 * @access	private
 	 * @return	array
 	 */
-	function _fetch_assoc()
+	protected function _fetch_assoc()
 	{
 		return cubrid_fetch_assoc($this->result_id);
 	}
@@ -169,10 +161,9 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 *
 	 * Returns the result set as an object
 	 *
-	 * @access	private
 	 * @return	object
 	 */
-	function _fetch_object()
+	protected function _fetch_object()
 	{
 		return cubrid_fetch_object($this->result_id);
 	}
