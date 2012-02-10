@@ -9,7 +9,7 @@
  * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
- * @since		Version 1.0
+ * @since		Version 2.1
  * @filesource
  */
 
@@ -24,28 +24,32 @@
  */
 class CI_DB_cubrid_utility extends CI_DB_utility {
 
-	/**
-	 * List databases
-	 *
-	 * @access	private
-	 * @return	array
-	 */
-	function _list_databases()
-	{
-		// CUBRID does not allow to see the list of all databases on the
-		// server. It is the way its architecture is designed. Every
-		// database is independent and isolated.
-		// For this reason we can return only the name of the currect
-		// connected database.
-		if ($this->conn_id)
-		{
-			return "SELECT '" . $this->database . "'";
-		}
-		else
-		{
-			return FALSE;
-		}
-	}
+    /**
+     * List databases
+     *
+     * @access	public
+     * @return	bool
+     */
+    function list_databases()
+    {
+        // Is there a cached result?
+        if (isset($this->data_cache['db_names']))
+        {
+            return $this->data_cache['db_names'];
+        }
+
+        $query = $this->db->query('SELECT LIST_DBS()');
+        $dbs = array();
+        if ($query->num_rows() > 0)
+        {
+            // CUBRID returns a list of databases in one row separated
+            // by spaces.
+            $dbs = explode(' ', current(current($query->result_array())));
+        }
+
+        $this->data_cache['db_names'] = $dbs;
+        return $this->data_cache['db_names'];
+    }
 
 	// --------------------------------------------------------------------
 
@@ -57,11 +61,11 @@ class CI_DB_cubrid_utility extends CI_DB_utility {
 	 * @access	private
 	 * @param	string	the table name
 	 * @return	object
-	 * @link 	http://www.cubrid.org/manual/840/en/Optimize%20Database
+	 * @link 	http://www.cubrid.org/manual/841/en/Optimize%20Database
 	 */
 	function _optimize_table($table)
 	{
-		// No SQL based support in CUBRID as of version 8.4.0. Database or
+		// No SQL based support in CUBRID as of version 8.4.1. Database or
 		// table optimization can be performed using CUBRID Manager
 		// database administration tool. See the link above for more info.
 		return FALSE;
@@ -81,7 +85,7 @@ class CI_DB_cubrid_utility extends CI_DB_utility {
 	 */
 	function _repair_table($table)
 	{
-		// Not supported in CUBRID as of version 8.4.0. Database or
+		// Not supported in CUBRID as of version 8.4.1. Database or
 		// table consistency can be checked using CUBRID Manager
 		// database administration tool. See the link above for more info.
 		return FALSE;
@@ -97,7 +101,7 @@ class CI_DB_cubrid_utility extends CI_DB_utility {
 	 */
 	function _backup($params = array())
 	{
-		// No SQL based support in CUBRID as of version 8.4.0. Database or
+		// No SQL based support in CUBRID as of version 8.4.1. Database or
 		// table backup can be performed using CUBRID Manager
 		// database administration tool.
 		return $this->db->display_error('db_unsuported_feature');
