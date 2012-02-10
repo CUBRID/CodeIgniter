@@ -90,20 +90,20 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	function field_data()
 	{
 		$retval = array();
+		$colIdx = 0;
 
 		while ($field = @cubrid_fetch_field($this->result_id))
 		{
-			preg_match('/([a-zA-Z]+)(\((\d+)\))?/', $field->type, $matches);
-
-			$length = isset($matches[2]) ? (int)$matches[3] : false;
-
 			$F              = new stdClass();
 			$F->name        = $field->name;
-			$F->type        = $matches[1];
+			// CUBRID returns type as varchar(100) for example,
+			// that's why we need to remove all brackets and digits.
+			$F->type        = preg_replace('/[\d()]/', '', $field->type);
 			$F->default     = $field->def;
-			// if length is not specified like in case of TIMESTAMP
-			// fall back to what API returns.
-			$F->max_length  = $length ? $length : $field->max_length;
+			// use CUBRID's native API to obtain column's max_length,
+			// otherwise $field->max_length returns incorrect info.
+			// See #150.
+			$F->max_length  = cubrid_field_len($this->result_id, $colIdx++);
 			$F->primary_key = $field->primary_key;
 
 			$retval[] = $F;
