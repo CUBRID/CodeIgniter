@@ -36,8 +36,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 
 	var $dbdriver = 'cubrid';
 
-	// The character used for escaping - no need in CUBRID
-	var	$_escape_char = '';
+	// The character used for escaping. Using MySQL style.
+    // Also supports [] like in MSSQL, or "" like in Oracle.
+	protected $_escape_char = '`';
 
 	// clause and character used for LIKE escape sequences - not used in CUBRID
 	var $_like_escape_str = '';

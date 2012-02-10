@@ -9,7 +9,7 @@
  * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
- * @since		Version 1.0
+ * @since		Version 2.1
  * @filesource
  */
 
@@ -34,7 +34,7 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 	function _create_database($name)
 	{
 		// CUBRID does not allow to create a database in SQL. The GUI tools
-		// have to be used for this purpose.
+		// or command line "cubrid createdb" utility have to be used for this purpose.
 		return FALSE;
 	}
 
@@ -50,7 +50,7 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 	function _drop_database($name)
 	{
 		// CUBRID does not allow to drop a database in SQL. The GUI tools
-		// have to be used for this purpose.
+		// or command line "cubbrid deletedb" utility have to be used for this purpose.
 		return FALSE;
 	}
 
@@ -81,7 +81,7 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 			{
 				$attributes = array_change_key_case($attributes, CASE_UPPER);
 
-				$sql .= "\n\t\"" . $this->db->_protect_identifiers($field) . "\"";
+				$sql .= "\n\t" . $this->db->_protect_identifiers($field) . "";
 
 				if (array_key_exists('NAME', $attributes))
 				{
@@ -101,9 +101,9 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 							case 'numeric':
 								$sql .= '('.implode(',', $attributes['CONSTRAINT']).')';
 								break;
-							case 'enum': 	// As of version 8.4.0 CUBRID does not support
-											// enum data type.
-											break;
+							case 'enum': 	// enum data type will be supported in the
+                                            // next release as a part of MySQL Compatibility.
+                                break;
 							case 'set':
 								$sql .= '("'.implode('","', $attributes['CONSTRAINT']).'")';
 								break;
@@ -116,7 +116,7 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 				if (array_key_exists('UNSIGNED', $attributes) && $attributes['UNSIGNED'] === TRUE)
 				{
 					//$sql .= ' UNSIGNED';
-					// As of version 8.4.0 CUBRID does not support UNSIGNED INTEGER data type.
+					// As of version 8.4.1 CUBRID does not support UNSIGNED INTEGER data type.
 					// Will be supported in the next release as a part of MySQL Compatibility.
 				}
 
@@ -175,7 +175,7 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 		if ($if_not_exists === TRUE)
 		{
 			//$sql .= 'IF NOT EXISTS ';
-			// As of version 8.4.0 CUBRID does not support this SQL syntax.
+			// As of version 8.4.1 CUBRID does not support this SQL syntax.
 		}
 
 		$sql .= $this->db->_escape_identifiers($table)." (";
@@ -185,9 +185,11 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 		// If there is a PK defined
 		if (count($primary_keys) > 0)
 		{
-			$key_name = "pk_" . $table . "_" .
-				$this->db->_protect_identifiers(implode('_', $primary_keys));
-			
+            // Index names in CUBRID are unique per database, So it is recommended to indicate
+            // in any index name the name of the table the index belongs to. This will assure
+            // that this index is unique in the entire database. The suggested form is
+            // pk_tableName_col1Name_col2Name_etc:
+			$key_name = $this->db->_protect_identifiers("pk_" . $table . "_" . implode('_', $primary_keys));
 			$primary_keys = $this->db->_protect_identifiers($primary_keys);
 			$sql .= ",\n\tCONSTRAINT " . $key_name . " PRIMARY KEY(" . implode(', ', $primary_keys) . ")";
 		}
@@ -198,16 +200,16 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 			{
 				if (is_array($key))
 				{
-					$key_name = $this->db->_protect_identifiers(implode('_', $key));
+					$key_name = $this->db->_protect_identifiers("idx_" . $table . "_" . implode('_', $key));
 					$key = $this->db->_protect_identifiers($key);
 				}
 				else
 				{
-					$key_name = $this->db->_protect_identifiers($key);
+					$key_name = $this->db->_protect_identifiers("idx_" . $table . "_" . $key);
 					$key = array($key_name);
 				}
 				
-				$sql .= ",\n\tKEY \"{$key_name}\" (" . implode(', ', $key) . ")";
+				$sql .= ",\n\tKEY {$key_name} (" . implode(', ', $key) . ")";
 			}
 		}
 
