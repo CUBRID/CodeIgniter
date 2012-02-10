@@ -9,7 +9,7 @@
  * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
  * @license		http://codeigniter.com/user_guide/license.html
  * @link		http://codeigniter.com
- * @since		Version 2.0.2
+ * @since		Version 2.1
  * @filesource
  */
 
@@ -88,41 +88,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 			$F->type		= $field->type;
 			$F->default		= $field->def;
 			$F->max_length	= $field->max_length;
-
-			// At this moment primary_key property is not returned when
-			// cubrid_fetch_field is called. The following code will
-			// provide a patch for it. primary_key property will be added
-			// in the next release.
-
-			// TODO: later version of CUBRID will provide primary_key
-			// property.
-			// When PK is defined in CUBRID, an index is automatically
-			// created in the db_index system table in the form of
-			// pk_tblname_fieldname. So the following will count how many
-			// columns are there which satisfy this format.
-			// The query will search for exact single columns, thus
-			// compound PK is not supported.
-			$res = cubrid_query($this->conn_id,
-				"SELECT COUNT(*) FROM db_index WHERE class_name = '" . $field->table .
-				"' AND is_primary_key = 'YES' AND index_name = 'pk_" .
-				$field->table . "_" . $field->name . "'"
-			);
-
-			if ($res)
-			{
-				$row = cubrid_fetch_array($res, CUBRID_NUM);
-				$F->primary_key = ($row[0] > 0 ? 1 : null);
-			}
-			else
-			{
-				$F->primary_key = null;
-			}
-
-			if (is_resource($res))
-			{
-				cubrid_close_request($res);
-				$this->result_id = FALSE;
-			}
+            $F->primary_key = $field->primary_key;
 
 			$retval[] = $F;
 		}
