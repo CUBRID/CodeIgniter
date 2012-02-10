@@ -79,8 +79,6 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	{
 		$retval = array();
 
-		$tablePrimaryKeys = array();
-
 		while ($field = cubrid_fetch_field($this->result_id))
 		{
 			$F				= new stdClass();
