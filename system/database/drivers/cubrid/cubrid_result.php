@@ -88,7 +88,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 			$F->type		= $field->type;
 			$F->default		= $field->def;
 			$F->max_length	= $field->max_length;
-            $F->primary_key = $field->primary_key;
+			$F->primary_key = $field->primary_key;
 
 			$retval[] = $F;
 		}
