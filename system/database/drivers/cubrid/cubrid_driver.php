@@ -34,23 +34,24 @@ class CI_DB_cubrid_driver extends CI_DB {
 	// explicitly specifies another one.
 	const DEFAULT_PORT = 33000;
 
-	var $dbdriver = 'cubrid';
+	public $dbdriver = 'cubrid';
+	public $auto_commit = TRUE;
 
 	// The character used for escaping. Using MySQL style.
 	// Also supports [] like in MSSQL, or "" like in Oracle.
 	protected $_escape_char = '`';
 
 	// clause and character used for LIKE escape sequences - not used in CUBRID
-	var $_like_escape_str = '';
-	var $_like_escape_chr = '';
+	protected $_like_escape_str = '';
+	protected $_like_escape_chr = '';
 
 	/**
 	 * The syntax to count rows is slightly different across different
 	 * database engines, so this string appears in each driver and is
 	 * used for the count_all() and count_all_results() functions.
 	 */
-	var $_count_string = 'SELECT COUNT(*) AS ';
-	var $_random_keyword = ' RAND()'; // database specific random keyword
+	protected $_count_string = 'SELECT COUNT(*) AS ';
+	protected $_random_keyword = ' RAND()'; // database specific random keyword
 
 	/**
 	 * Non-persistent database connection
