@@ -79,13 +79,19 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	{
 		$retval = array();
 
-		while ($field = cubrid_fetch_field($this->result_id))
+		while ($field = @cubrid_fetch_field($this->result_id))
 		{
-			$F				= new stdClass();
-			$F->name		= $field->name;
-			$F->type		= $field->type;
-			$F->default		= $field->def;
-			$F->max_length	= $field->max_length;
+			preg_match('/([a-zA-Z]+)(\((\d+)\))?/', $field->type, $matches);
+
+			$length = isset($matches[2]) ? (int)$matches[3] : false;
+
+			$F              = new stdClass();
+			$F->name        = $field->name;
+			$F->type        = $matches[1];
+			$F->default     = $field->def;
+			// if length is not specified like in case of TIMESTAMP
+			// fall back to what API returns.
+			$F->max_length  = $length ? $length : $field->max_length;
 			$F->primary_key = $field->primary_key;
 
 			$retval[] = $F;
