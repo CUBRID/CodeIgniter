@@ -336,9 +336,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 			return 0;
 		}
 
-		$row = $query->row();
+		$query = $query->row();
 		$this->_reset_select();
-		return (int) $row->numrows;
+		return (int) $query->numrows;
 	}
 
 	// --------------------------------------------------------------------
