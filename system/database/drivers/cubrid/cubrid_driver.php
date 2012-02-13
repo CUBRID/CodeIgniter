@@ -660,8 +660,6 @@ class CI_DB_cubrid_driver extends CI_DB {
 	function _update_batch($table, $values, $index, $where = NULL)
 	{
 		$ids = array();
-		$where = ($where != '' AND count($where) >=1) ? implode(" ", $where).' AND ' : '';
-
 		foreach ($values as $key => $val)
 		{
 			$ids[] = $val[$index];
@@ -670,30 +668,22 @@ class CI_DB_cubrid_driver extends CI_DB {
 			{
 				if ($field != $index)
 				{
-					$final[$field][] = 'WHEN '.$index.' = '.$val[$index].' THEN '.$val[$field];
+					$final[$field][] =  'WHEN '.$index.' = '.$val[$index].' THEN '.$val[$field];
 				}
 			}
 		}
 
-		$sql = "UPDATE ".$table." SET ";
 		$cases = '';
-
 		foreach ($final as $k => $v)
 		{
-			$cases .= $k.' = CASE '."\n";
-			foreach ($v as $row)
-			{
-				$cases .= $row."\n";
-			}
-
-			$cases .= 'ELSE '.$k.' END, ';
+			$cases .= $k." = CASE \n"
+				.implode("\n", $v)."\n"
+				.'ELSE '.$k.' END, ';
 		}
 
-		$sql .= substr($cases, 0, -2);
-
-		$sql .= ' WHERE '.$where.$index.' IN ('.implode(',', $ids).')';
-
-		return $sql;
+		return 'UPDATE '.$table.' SET '.substr($cases, 0, -2)
+			.' WHERE '.(($where != '' && count($where) > 0) ? implode(' ', $where).' AND ' : '')
+			.$index.' IN('.implode(',', $ids).')';
 	}
 
 	// --------------------------------------------------------------------
