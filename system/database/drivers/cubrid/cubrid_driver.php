@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
@@ -24,8 +24,6 @@
  * @since		Version 2.1
  * @filesource
  */
-
-// ------------------------------------------------------------------------
 
 /**
  * CUBRID Database Adapter Class
