@@ -40,7 +40,6 @@
  */
 class CI_DB_cubrid_driver extends CI_DB {
 
-
 	public $dbdriver = 'cubrid';
 	public $auto_commit = TRUE;
 	// Default CUBRID Broker port. Will be used unless user
@@ -747,7 +746,6 @@ class CI_DB_cubrid_driver extends CI_DB {
 	}
 
 }
-
 
 /* End of file cubrid_driver.php */
 /* Location: ./system/database/drivers/cubrid/cubrid_driver.php */
