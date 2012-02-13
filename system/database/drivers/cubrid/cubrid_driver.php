@@ -65,10 +65,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Non-persistent database connection
 	 *
-	 * @access	private called by the base class
 	 * @return	resource
 	 */
-	function db_connect()
+	public function db_connect()
 	{
 		// TRUE is passed to cubrid_connect to force to create a new link
 		// instead of reusing a possibly open connection.
@@ -80,10 +79,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Persistent database connection
 	 *
-	 * @access	private called by the base class
 	 * @return	resource
 	 */
-	function db_pconnect()
+	public function db_pconnect()
 	{
 		return @cubrid_pconnect($this->hostname, $this->port, $this->database, $this->username, $this->password);
 	}
@@ -96,10 +94,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * Keep / reestablish the db connection if no queries have been
 	 * sent for a length of time exceeding the server's idle timeout
 	 *
-	 * @access	public
 	 * @return	void
 	 */
-	function reconnect()
+	public function reconnect()
 	{
 		if (cubrid_ping($this->conn_id) === FALSE)
 		{
@@ -112,10 +109,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Select the database
 	 *
-	 * @access	private called by the base class
 	 * @return	resource
 	 */
-	function db_select()
+	public function db_select()
 	{
 		// In CUBRID there is no need to select a database as the database
 		// is chosen at the connection time. See db_connect().
@@ -129,12 +125,11 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Set client character set
 	 *
-	 * @access	public
 	 * @param	string
 	 * @param	string
 	 * @return	resource
 	 */
-	function db_set_charset($charset, $collation)
+	public function db_set_charset($charset, $collation)
 	{
 		// In CUBRID, there is no need to set charset or collation.
 		// This is why returning true will allow the application continue
@@ -147,10 +142,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Version number query string
 	 *
-	 * @access	public
 	 * @return	string
 	 */
-	function _version()
+	protected function _version()
 	{
 		// To obtain the CUBRID Server version, no need to run the SQL query.
 		// CUBRID PHP API provides a function to determin this value.
@@ -165,11 +159,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Execute the query
 	 *
-	 * @access	private called by the base class
 	 * @param	string	an SQL query
 	 * @return	resource
 	 */
-	function _execute($sql)
+	protected function _execute($sql)
 	{
 		$sql = $this->_prep_query($sql);
 		return @cubrid_query($sql, $this->conn_id);
@@ -182,11 +175,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * If needed, each database adapter can prep the query string
 	 *
-	 * @access	private called by execute()
 	 * @param	string	an SQL query
 	 * @return	string
 	 */
-	function _prep_query($sql)
+	protected function _prep_query($sql)
 	{
 		// No need to prepare
 		return $sql;
@@ -197,10 +189,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Begin Transaction
 	 *
-	 * @access	public
 	 * @return	bool
 	 */
-	function trans_begin($test_mode = FALSE)
+	public function trans_begin($test_mode = FALSE)
 	{
 		if ( ! $this->trans_enabled)
 		{
@@ -231,10 +222,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Commit Transaction
 	 *
-	 * @access	public
 	 * @return	bool
 	 */
-	function trans_commit()
+	public function trans_commit()
 	{
 		if ( ! $this->trans_enabled)
 		{
@@ -262,10 +252,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Rollback Transaction
 	 *
-	 * @access	public
 	 * @return	bool
 	 */
-	function trans_rollback()
+	public function trans_rollback()
 	{
 		if ( ! $this->trans_enabled)
 		{
@@ -293,12 +282,11 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Escape String
 	 *
-	 * @access	public
 	 * @param	string
 	 * @param	bool	whether or not the string will be used in a LIKE condition
 	 * @return	string
 	 */
-	function escape_str($str, $like = FALSE)
+	public function escape_str($str, $like = FALSE)
 	{
 		if (is_array($str))
 		{
@@ -335,10 +323,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Affected Rows
 	 *
-	 * @access	public
 	 * @return	integer
 	 */
-	function affected_rows()
+	public function affected_rows()
 	{
 		return @cubrid_affected_rows($this->conn_id);
 	}
@@ -348,10 +335,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Insert ID
 	 *
-	 * @access	public
 	 * @return	integer
 	 */
-	function insert_id()
+	public function insert_id()
 	{
 		return @cubrid_insert_id($this->conn_id);
 	}
@@ -364,11 +350,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * Generates a platform-specific query string that counts all records in
 	 * the specified table
 	 *
-	 * @access	public
 	 * @param	string
 	 * @return	string
 	 */
-	function count_all($table = '')
+	public function count_all($table = '')
 	{
 		if ($table == '')
 		{
@@ -394,11 +379,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific query string so that the table names can be fetched
 	 *
-	 * @access	private
 	 * @param	boolean
 	 * @return	string
 	 */
-	function _list_tables($prefix_limit = FALSE)
+	protected function _list_tables($prefix_limit = FALSE)
 	{
 		$sql = "SHOW TABLES";
 
@@ -417,11 +401,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific query string so that the column names can be fetched
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @return	string
 	 */
-	function _list_columns($table = '')
+	public function _list_columns($table = '')
 	{
 		return "SHOW COLUMNS FROM ".$this->_protect_identifiers($table, TRUE, NULL, FALSE);
 	}
@@ -433,11 +416,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific query so that the column data can be retrieved
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @return	object
 	 */
-	function _field_data($table)
+	public function _field_data($table)
 	{
 		return "SELECT * FROM ".$table." LIMIT 1";
 	}
@@ -447,10 +429,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * The error message string
 	 *
-	 * @access	private
 	 * @return	string
 	 */
-	function _error_message()
+	protected function _error_message()
 	{
 		return cubrid_error($this->conn_id);
 	}
@@ -460,10 +441,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * The error message number
 	 *
-	 * @access	private
 	 * @return	integer
 	 */
-	function _error_number()
+	protected function _error_number()
 	{
 		return cubrid_errno($this->conn_id);
 	}
@@ -475,11 +455,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * This function escapes column and table names
 	 *
-	 * @access	private
 	 * @param	string
 	 * @return	string
 	 */
-	function _escape_identifiers($item)
+	public function _escape_identifiers($item)
 	{
 		if ($this->_escape_char == '')
 		{
@@ -518,11 +497,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * This function implicitly groups FROM tables so there is no confusion
 	 * about operator precedence in harmony with SQL standards
 	 *
-	 * @access	public
-	 * @param	type
-	 * @return	type
+	 * @param	string	table name
+	 * @return	string
 	 */
-	function _from_tables($tables)
+	protected function _from_tables($tables)
 	{
 		if ( ! is_array($tables))
 		{
@@ -539,13 +517,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific insert string from the supplied data
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the insert keys
 	 * @param	array	the insert values
 	 * @return	string
 	 */
-	function _insert($table, $keys, $values)
+	protected function _insert($table, $keys, $values)
 	{
 		return "INSERT INTO ".$table." (\"".implode('", "', $keys)."\") VALUES (".implode(', ', $values).")";
 	}
@@ -558,13 +535,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific replace string from the supplied data
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the insert keys
 	 * @param	array	the insert values
 	 * @return	string
 	 */
-	function _replace($table, $keys, $values)
+	protected function _replace($table, $keys, $values)
 	{
 		return 'REPLACE INTO '.$table.' ('.implode(', ', $keys).') VALUES ('.implode(', ', $values).')';
 	}
@@ -576,13 +552,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific insert string from the supplied data
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the insert keys
 	 * @param	array	the insert values
 	 * @return	string
 	 */
-	function _insert_batch($table, $keys, $values)
+	protected function _insert_batch($table, $keys, $values)
 	{
 		return 'INSERT INTO '.$table.' ('.implode(', ', $keys).') VALUES '.implode(', ', $values);
 	}
@@ -628,13 +603,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific batch update string from the supplied data
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the update data
 	 * @param	array	the where clause
 	 * @return	string
 	 */
-	function _update_batch($table, $values, $index, $where = NULL)
+	protected function _update_batch($table, $values, $index, $where = NULL)
 	{
 		$ids = array();
 		foreach ($values as $key => $val)
@@ -673,11 +647,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * If the database does not support the truncate() command
 	 * This function maps to "DELETE FROM table"
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @return	string
 	 */
-	function _truncate($table)
+	protected function _truncate($table)
 	{
 		return "TRUNCATE ".$table;
 	}
@@ -689,13 +662,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific delete string from the supplied data
 	 *
-	 * @access	public
 	 * @param	string	the table name
 	 * @param	array	the where clause
 	 * @param	string	the limit clause
 	 * @return	string
 	 */
-	function _delete($table, $where = array(), $like = array(), $limit = FALSE)
+	protected function _delete($table, $where = array(), $like = array(), $limit = FALSE)
 	{
 		$conditions = '';
 
@@ -720,13 +692,12 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 *
 	 * Generates a platform-specific LIMIT clause
 	 *
-	 * @access	public
 	 * @param	string	the sql query string
 	 * @param	int	the number of rows to limit the query to
 	 * @param	int	the offset value
 	 * @return	string
 	 */
-	function _limit($sql, $limit, $offset)
+	protected function _limit($sql, $limit, $offset)
 	{
 		return $sql.' LIMIT '.($offset == 0 ? '' : $offset.', ').$limit;
 	}
@@ -736,11 +707,10 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Close DB Connection
 	 *
-	 * @access	public
 	 * @param	resource
 	 * @return	void
 	 */
-	function _close($conn_id)
+	protected function _close($conn_id)
 	{
 		@cubrid_close($conn_id);
 	}
