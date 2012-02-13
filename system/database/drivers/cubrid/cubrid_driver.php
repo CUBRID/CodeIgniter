@@ -493,7 +493,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	protected function _insert($table, $keys, $values)
 	{
-		return "INSERT INTO ".$table." (\"".implode('", "', $keys)."\") VALUES (".implode(', ', $values).")";
+		return 'INSERT INTO '.$table.' ('.implode(', ', $keys).') VALUES ('.implode(', ', $values).')';
 	}
 
 	// --------------------------------------------------------------------
