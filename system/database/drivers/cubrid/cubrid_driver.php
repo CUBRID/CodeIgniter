@@ -147,7 +147,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	protected function _version()
 	{
 		// To obtain the CUBRID Server version, no need to run the SQL query.
-		// CUBRID PHP API provides a function to determin this value.
+		// CUBRID PHP API provides a function to determine this value.
 		// This is why we also need to add 'cubrid' value to the list of
 		// $driver_version_exceptions array in DB_driver class in
 		// version() function.
