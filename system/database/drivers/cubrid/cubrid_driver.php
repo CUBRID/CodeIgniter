@@ -332,7 +332,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 			return $str;
 		}
 
-		if (function_exists('cubrid_real_escape_string') AND is_resource($this->conn_id))
+		if (function_exists('cubrid_real_escape_string') AND (is_resource($this->conn_id) ||
+					get_resource_type($this->conn_id) == "Unknown" &&
+					preg_match('/Resource id #/', strval($this->conn_id))))
 		{
 			$str = cubrid_real_escape_string($str, $this->conn_id);
 		}
