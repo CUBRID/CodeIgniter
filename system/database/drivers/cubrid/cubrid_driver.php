@@ -140,7 +140,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	function db_select()
 	{
 		// In CUBRID there is no need to select a database as the database
-		// is chosen at the connection time.
+		// is chosen at the connection time. See db_connect().
 		// So, to determine if the database is "selected", all we have to
 		// do is ping the server and return that value.
 		return cubrid_ping($this->conn_id);
