@@ -734,19 +734,16 @@ class CI_DB_cubrid_driver extends CI_DB {
 
 		if (count($where) > 0 OR count($like) > 0)
 		{
-			$conditions = "\nWHERE ";
-			$conditions .= implode("\n", $this->ar_where);
+			$conditions = "\nWHERE ".implode("\n", $this->ar_where);
 
 			if (count($where) > 0 && count($like) > 0)
 			{
-				$conditions .= " AND ";
+				$conditions .= ' AND ';
 			}
 			$conditions .= implode("\n", $like);
 		}
 
-		$limit = ( ! $limit) ? '' : ' LIMIT '.$limit;
-
-		return "DELETE FROM ".$table.$conditions.$limit;
+		return 'DELETE FROM '.$table.$conditions.( ! $limit ? '' : ' LIMIT '.$limit);
 	}
 
 	// --------------------------------------------------------------------
