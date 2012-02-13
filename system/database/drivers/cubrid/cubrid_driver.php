@@ -46,6 +46,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 
 	public $dbdriver = 'cubrid';
 	public $auto_commit = TRUE;
+	// Default CUBRID Broker port. Will be used unless user
+	// explicitly specifies another one.
+	public $port = 33000;
 
 	// The character used for escaping. Using MySQL style.
 	// Also supports [] like in MSSQL, or "" like in Oracle.
