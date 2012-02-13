@@ -74,30 +74,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	function db_connect()
 	{
-		// If no port is defined by the user, use the default value
-		if ($this->port == '')
-		{
-			$this->port = self::DEFAULT_PORT;
-		}
-
-		$conn = cubrid_connect($this->hostname, $this->port, $this->database, $this->username, $this->password);
-
-		if ($conn)
-		{
-			// Check if a user wants to run queries in dry, i.e. run the
-			// queries but not commit them.
-			if (isset($this->auto_commit) && ! $this->auto_commit)
-			{
-				cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_FALSE);
-			}
-			else
-			{
-				cubrid_set_autocommit($conn, CUBRID_AUTOCOMMIT_TRUE);
-				$this->auto_commit = TRUE;
-			}
-		}
-
-		return $conn;
+		// TRUE is passed to cubrid_connect to force to create a new link
+		// instead of reusing a possibly open connection.
+		return cubrid_connect($this->hostname, $this->port, $this->database, $this->username, $this->password, TRUE);
 	}
 
 	// --------------------------------------------------------------------
