@@ -192,13 +192,8 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	public function trans_begin($test_mode = FALSE)
 	{
-		if ( ! $this->trans_enabled)
-		{
-			return TRUE;
-		}
-
 		// When transactions are nested we only begin/commit/rollback the outermost ones
-		if ($this->_trans_depth > 0)
+		if ( ! $this->trans_enabled OR $this->_trans_depth > 0)
 		{
 			return TRUE;
 		}
@@ -206,14 +201,9 @@ class CI_DB_cubrid_driver extends CI_DB {
 		// Reset the transaction failure flag.
 		// If the $test_mode flag is set to TRUE transactions will be rolled back
 		// even if the queries produce a successful result.
-		$this->_trans_failure = ($test_mode === TRUE) ? TRUE : FALSE;
+		$this->_trans_failure = ($test_mode === TRUE);
 
-		if (cubrid_get_autocommit($this->conn_id))
-		{
-			cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_FALSE);
-		}
-
-		return TRUE;
+		return cubrid_set_autocommit($this->conn_id, CUBRID_AUTOCOMMIT_FALSE);
 	}
 
 	// --------------------------------------------------------------------
