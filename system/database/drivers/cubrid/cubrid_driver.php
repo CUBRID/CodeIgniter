@@ -40,9 +40,6 @@
  */
 class CI_DB_cubrid_driver extends CI_DB {
 
-	// Default CUBRID Broker port. Will be used unless user
-	// explicitly specifies another one.
-	const DEFAULT_PORT = 33000;
 
 	public $dbdriver = 'cubrid';
 	public $auto_commit = TRUE;
