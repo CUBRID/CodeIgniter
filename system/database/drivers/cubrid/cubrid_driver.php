@@ -438,24 +438,20 @@ class CI_DB_cubrid_driver extends CI_DB {
 		{
 			if (strpos($item, '.'.$id) !== FALSE)
 			{
-				$str = $this->_escape_char. str_replace('.', $this->_escape_char.'.', $item);
+				$item = str_replace('.', $this->_escape_char.'.', $item);
 
 				// remove duplicates if the user already included the escape
-				return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
+				return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $this->_escape_char.$item);
 			}
 		}
 
 		if (strpos($item, '.') !== FALSE)
 		{
-			$str = $this->_escape_char.str_replace('.', $this->_escape_char.'.'.$this->_escape_char, $item).$this->_escape_char;
-		}
-		else
-		{
-			$str = $this->_escape_char.$item.$this->_escape_char;
+			$item = str_replace('.', $this->_escape_char.'.'.$this->_escape_char, $item);
 		}
 
 		// remove duplicates if the user already included the escape
-		return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $str);
+		return preg_replace('/['.$this->_escape_char.']+/', $this->_escape_char, $this->_escape_char.$item.$this->_escape_char);
 	}
 
 	// --------------------------------------------------------------------
