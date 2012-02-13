@@ -101,20 +101,13 @@ class CI_DB_cubrid_driver extends CI_DB {
 
 	/**
 	 * Persistent database connection
-	 * In CUBRID persistent DB connection is supported natively in CUBRID
-	 * engine which can be configured in the CUBRID Broker configuration
-	 * file by setting the CCI_PCONNECT parameter to ON. In that case, all
-	 * connections established between the client application and the
-	 * server will become persistent. This is calling the same
-	 * @cubrid_connect function will establish persisten connection
-	 * considering that the CCI_PCONNECT is ON.
 	 *
 	 * @access	private called by the base class
 	 * @return	resource
 	 */
 	function db_pconnect()
 	{
-		return $this->db_connect();
+		return @cubrid_pconnect($this->hostname, $this->port, $this->database, $this->username, $this->password);
 	}
 
 	// --------------------------------------------------------------------
