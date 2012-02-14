@@ -160,7 +160,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * Execute the query
 	 *
 	 * @param	string	an SQL query
-	 * @return	resource
+	 * @return	mixed
 	 */
 	protected function _execute($sql)
 	{
@@ -267,7 +267,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 			return $str;
 		}
 
-		if (function_exists('cubrid_real_escape_string') AND (is_resource($this->conn_id) ||
+		if (function_exists('cubrid_real_escape_string') && (is_resource($this->conn_id) ||
 					get_resource_type($this->conn_id) == "Unknown" &&
 					preg_match('/Resource id #/', strval($this->conn_id))))
 		{
@@ -281,7 +281,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 		// escape LIKE condition wildcards
 		if ($like === TRUE)
 		{
-			$str = str_replace(array('%', '_'), array('\\%', '\\_'), $str);
+			return str_replace(array('%', '_'), array('\\%', '\\_'), $str);
 		}
 
 		return $str;
@@ -292,7 +292,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Affected Rows
 	 *
-	 * @return	integer
+	 * @return	int
 	 */
 	public function affected_rows()
 	{
@@ -304,7 +304,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * Insert ID
 	 *
-	 * @return	integer
+	 * @return	int
 	 */
 	public function insert_id()
 	{
@@ -329,7 +329,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 			return 0;
 		}
 		
-		$query = $this->query($this->_count_string . $this->_protect_identifiers('numrows') . " FROM " . $this->_protect_identifiers($table, TRUE, NULL, FALSE));
+		$query = $this->query($this->_count_string.$this->_protect_identifiers('numrows').' FROM '.$this->_protect_identifiers($table, TRUE, NULL, FALSE));
 
 		if ($query->num_rows() == 0)
 		{
@@ -353,11 +353,11 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	protected function _list_tables($prefix_limit = FALSE)
 	{
-		$sql = "SHOW TABLES";
+		$sql = 'SHOW TABLES';
 
-		if ($prefix_limit !== FALSE AND $this->dbprefix != '')
+		if ($prefix_limit !== FALSE && $this->dbprefix != '')
 		{
-			$sql .= " LIKE '".$this->escape_like_str($this->dbprefix)."%'";
+			return $sql." LIKE '".$this->escape_like_str($this->dbprefix)."%'";
 		}
 
 		return $sql;
@@ -375,7 +375,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	public function _list_columns($table = '')
 	{
-		return "SHOW COLUMNS FROM ".$this->_protect_identifiers($table, TRUE, NULL, FALSE);
+		return 'SHOW COLUMNS FROM '.$this->_protect_identifiers($table, TRUE, NULL, FALSE);
 	}
 
 	// --------------------------------------------------------------------
@@ -386,11 +386,11 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 * Generates a platform-specific query so that the column data can be retrieved
 	 *
 	 * @param	string	the table name
-	 * @return	object
+	 * @return	string
 	 */
 	public function _field_data($table)
 	{
-		return "SELECT * FROM ".$table." LIMIT 1";
+		return 'SELECT * FROM '.$table.' LIMIT 1';
 	}
 
 	// --------------------------------------------------------------------
@@ -410,7 +410,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	/**
 	 * The error message number
 	 *
-	 * @return	integer
+	 * @return	int
 	 */
 	protected function _error_number()
 	{
