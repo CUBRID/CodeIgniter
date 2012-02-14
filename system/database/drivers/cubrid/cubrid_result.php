@@ -93,7 +93,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 			// CUBRID returns type as varchar(100) for example,
 			// that's why we need to remove all brackets and digits.
 			$F->type		= preg_replace('/[\d()]/', '', $field->type);
-			$F->default	= $field->def;
+			$F->default	= $field->def == '' ? NULL : $field->def;
 			// use CUBRID's native API to obtain column's max_length,
 			// otherwise $field->max_length returns incorrect info.
 			// See #150.
