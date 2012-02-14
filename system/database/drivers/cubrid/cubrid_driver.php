@@ -296,7 +296,7 @@ class CI_DB_cubrid_driver extends CI_DB {
 	 */
 	public function affected_rows()
 	{
-		return @cubrid_affected_rows($this->conn_id);
+		return @cubrid_affected_rows();
 	}
 
 	// --------------------------------------------------------------------
