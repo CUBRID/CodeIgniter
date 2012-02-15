@@ -48,16 +48,7 @@ class CI_DB_cubrid_utility extends CI_DB_utility {
             return $this->data_cache['db_names'];
         }
 
-        $query = $this->db->query('SELECT LIST_DBS()');
-        $dbs = array();
-        if ($query->num_rows() > 0)
-        {
-            // CUBRID returns a list of databases in one row separated
-            // by spaces.
-            $dbs = explode(' ', current(current($query->result_array())));
-        }
-
-        $this->data_cache['db_names'] = $dbs;
+        $this->data_cache['db_names'] = cubrid_list_dbs($this->db->conn_id);
         return $this->data_cache['db_names'];
     }
 
