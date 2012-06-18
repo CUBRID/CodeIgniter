@@ -2,12 +2,12 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.1.6 or newer
+ * An open source application development framework for PHP 5.2.4 or newer
  *
  * NOTICE OF LICENSE
- * 
+ *
  * Licensed under the Open Software License version 3.0
- * 
+ *
  * This source file is subject to the Open Software License (OSL 3.0) that is
  * bundled with this package in the files license.txt / license.rst.  It is
  * also available through the world wide web at this URL:
@@ -34,35 +34,8 @@
  */
 class CI_DB_cubrid_forge extends CI_DB_forge {
 
-	/**
-	 * Create database
-	 *
-	 * @param	string	the database name
-	 * @return	bool
-	 */
-	public function _create_database($name)
-	{
-		// CUBRID does not allow to create a database in SQL. The GUI tools
-		// or command line "cubrid createdb" utility have to be used for this purpose.
-		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Drop database
-	 *
-	 * @param	string	the database name
-	 * @return	bool
-	 */
-	public function _drop_database($name)
-	{
-		// CUBRID does not allow to drop a database in SQL. The GUI tools
-		// or command line "cubbrid deletedb" utility have to be used for this purpose.
-		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
+	protected $_create_database	= FALSE;
+	protected $_drop_database	= FALSE;
 
 	/**
 	 * Process Fields
@@ -70,12 +43,12 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 	 * @param	mixed	the fields
 	 * @return	string
 	 */
-	private function _process_fields($fields)
+	protected function _process_fields($fields)
 	{
 		$current_field_count = 0;
 		$sql = '';
 
-		foreach ($fields as $field=>$attributes)
+		foreach ($fields as $field => $attributes)
 		{
 			// Numeric field names aren't allowed in databases, so if the key is
 			// numeric, we know it was assigned by PHP and the developer manually
@@ -88,8 +61,9 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 			{
 				$attributes = array_change_key_case($attributes, CASE_UPPER);
 
-				$sql .= "\n\t".$this->db->protect_identifiers($field)
-						.( ! empty($attributes['NAME']) ? ' '.$this->db->protect_identifiers($attributes['NAME']).' ' : '');
+				$sql .= "\n\t".$this->db->escape_identifiers($field);
+
+				empty($attributes['NAME']) OR $sql .= ' '.$this->db->escape_identifiers($attributes['NAME']).' ';
 
 				if ( ! empty($attributes['TYPE']))
 				{
@@ -104,8 +78,9 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 							case 'numeric':
 								$sql .= '('.implode(',', $attributes['CONSTRAINT']).')';
 								break;
-							case 'enum': 	// enum data type will be supported in the
-											// next release as a part of MySQL Compatibility.
+							case 'enum':
+								// Will be supported in the future as part a part of
+								// MySQL compatibility features.
 								break;
 							case 'set':
 								// values should be wrapped in single quotes in CUBRID
@@ -117,13 +92,32 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 					}
 				}
 
-				// As of version 8.4.1 CUBRID does not support UNSIGNED data types.
-				// Will be supported in the next release as a part of MySQL Compatibility.
-				// So will ignore UNSIGNED attributes
-				$sql .= (isset($attributes['DEFAULT']) ? " DEFAULT '".$attributes['DEFAULT']."'" : '')
-						.(( ! empty($attributes['NULL']) && $attributes['NULL'] === TRUE) ? ' NULL' : ' NOT NULL')
-						.(( ! empty($attributes['AUTO_INCREMENT']) && $attributes['AUTO_INCREMENT'] === TRUE) ? ' AUTO_INCREMENT' : '')
-						.(( ! empty($attributes['UNIQUE']) && $attributes['UNIQUE'] === TRUE) ? ' UNIQUE' : '');
+			/* As of version 8.4.1 CUBRID does not support UNSIGNED INTEGER data type.
+			 * Will be supported in the next release as a part of MySQL Compatibility.
+			 *
+				if (isset($attributes['UNSIGNED']) && $attributes['UNSIGNED'] === TRUE)
+				{
+					$sql .= ' UNSIGNED';
+				}
+			 */
+
+				if (isset($attributes['DEFAULT']))
+				{
+					$sql .= " DEFAULT '".$attributes['DEFAULT']."'";
+				}
+
+				$sql .= ( ! empty($attributes['NULL']) && $attributes['NULL'] === TRUE)
+					? ' NULL' : ' NOT NULL';
+
+				if ( ! empty($attributes['AUTO_INCREMENT']) && $attributes['AUTO_INCREMENT'] === TRUE)
+				{
+					$sql .= ' AUTO_INCREMENT';
+				}
+
+				if ( ! empty($attributes['UNIQUE']) && $attributes['UNIQUE'] === TRUE)
+				{
+					$sql .= ' UNIQUE';
+				}
 			}
 
 			// don't add a comma on the end of the last field
@@ -145,30 +139,27 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 	 * @param	mixed	the fields
 	 * @param	mixed	primary key(s)
 	 * @param	mixed	key(s)
-	 * @param	boolean	should 'IF NOT EXISTS' be added to the SQL
+	 * @param	bool	should 'IF NOT EXISTS' be added to the SQL
 	 * @return	bool
 	 */
-	public function _create_table($table, $fields, $primary_keys, $keys, $if_not_exists)
+	protected function _create_table($table, $fields, $primary_keys, $keys, $if_not_exists)
 	{
 		$sql = 'CREATE TABLE ';
 
+		/* As of version 8.4.1 CUBRID does not support this SQL syntax.
 		if ($if_not_exists === TRUE)
 		{
-			//$sql .= 'IF NOT EXISTS ';
-			// As of version 8.4.1 CUBRID does not support this SQL syntax.
+			$sql .= 'IF NOT EXISTS ';
 		}
+		*/
 
-		$sql .= $this->db->_escape_identifiers($table)." (".$this->_process_fields($fields);
+		$sql .= $this->db->escape_identifiers($table).' ('.$this->_process_fields($fields);
 
 		// If there is a PK defined
 		if (count($primary_keys) > 0)
 		{
-			// Index names in CUBRID are unique per database, So it is recommended to indicate
-			// in any index name the name of the table the index belongs to. This will assure
-			// that this index is unique in the entire database. The suggested form is
-			// pk_tableName_col1Name_col2Name_etc:
-			$key_name = $this->db->_protect_identifiers("pk_" . $table . "_" . implode('_', $primary_keys));
-			$sql .= ",\n\tCONSTRAINT " . $key_name . " PRIMARY KEY(" . implode(', ', $this->db->_protect_identifiers($primary_keys)) . ")";
+			$key_name = $this->db->escape_identifiers('pk_'.$table.'_'.implode('_', $primary_keys));
+			$sql .= ",\n\tCONSTRAINT ".$key_name.' PRIMARY KEY('.implode(', ', $this->db->escape_identifiers($primary_keys)).')';
 		}
 
 		if (is_array($keys) && count($keys) > 0)
@@ -177,32 +168,20 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 			{
 				if (is_array($key))
 				{
-					$key_name = $this->db->_protect_identifiers("idx_" . $table . "_" . implode('_', $key));
-					$key = $this->db->_protect_identifiers($key);
+					$key_name = $this->db->escape_identifiers('idx_'.$table.implode('_', $key));
+					$key = $this->db->escape_identifiers($key);
 				}
 				else
 				{
-					$key_name = $this->db->_protect_identifiers("idx_" . $table . "_" . $key);
+					$key_name = $this->db->escape_identifiers('idx_'.$table.$key);
 					$key = array($key_name);
 				}
-				
+
 				$sql .= ",\n\tKEY ".$key_name.' ('.implode(', ', $key).')';
 			}
 		}
 
 		return $sql."\n);";
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Drop Table
-	 *
-	 * @return	string
-	 */
-	public function _drop_table($table)
-	{
-		return "DROP TABLE IF EXISTS ".$this->db->_escape_identifiers($table);
 	}
 
 	// --------------------------------------------------------------------
@@ -217,36 +196,20 @@ class CI_DB_cubrid_forge extends CI_DB_forge {
 	 * @param	string	the column name
 	 * @param	array	fields
 	 * @param	string	the field after which we should add the new field
-	 * @return	object
+	 * @return	string
 	 */
-	public function _alter_table($alter_type, $table, $fields, $after_field = '')
+	protected function _alter_table($alter_type, $table, $fields, $after_field = '')
 	{
-		$sql = 'ALTER TABLE '.$this->db->protect_identifiers($table).' '.$alter_type.' ';
+		$sql = 'ALTER TABLE '.$this->db->escape_identifiers($table).' '.$alter_type.' ';
 
 		// DROP has everything it needs now.
-		if ($alter_type == 'DROP')
+		if ($alter_type === 'DROP')
 		{
-			return $sql.$this->db->_protect_identifiers($fields);
+			return $sql.$this->db->escape_identifiers($fields);
 		}
 
 		return $sql.$this->_process_fields($fields)
-	  			.($after_field != '' ? ' AFTER '.$this->db->protect_identifiers($after_field) : '');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Rename a table
-	 *
-	 * Generates a platform-specific query so that a table can be renamed
-	 *
-	 * @param	string	the old table name
-	 * @param	string	the new table name
-	 * @return	string
-	 */
-	public function _rename_table($table_name, $new_table_name)
-	{
-		return 'RENAME TABLE '.$this->db->_protect_identifiers($table_name)." AS ".$this->db->_protect_identifiers($new_table_name);
+			.($after_field !== '' ? ' AFTER '.$this->db->escape_identifiers($after_field) : '');
 	}
 
 }

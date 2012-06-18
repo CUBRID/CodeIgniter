@@ -2,12 +2,12 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.1.6 or newer
+ * An open source application development framework for PHP 5.2.4 or newer
  *
  * NOTICE OF LICENSE
- * 
+ *
  * Licensed under the Open Software License version 3.0
- * 
+ *
  * This source file is subject to the Open Software License (OSL 3.0) that is
  * bundled with this package in the files license.txt / license.rst.  It is
  * also available through the world wide web at this URL:
@@ -34,73 +34,30 @@
  */
 class CI_DB_cubrid_utility extends CI_DB_utility {
 
-    /**
-     * List databases
-     *
-     * @access	public
-     * @return	bool
-     */
-    function list_databases()
-    {
-        // Is there a cached result?
-        if (isset($this->data_cache['db_names']))
-        {
-            return $this->data_cache['db_names'];
-        }
-
-        $this->data_cache['db_names'] = cubrid_list_dbs($this->db->conn_id);
-        return $this->data_cache['db_names'];
-    }
-
-	// --------------------------------------------------------------------
-
 	/**
-	 * Optimize table query
+	 * List databases
 	 *
-	 * Generates a platform-specific query so that a table can be optimized
-	 *
-	 * @access	private
-	 * @param	string	the table name
-	 * @return	object
-	 * @link 	http://www.cubrid.org/manual/841/en/Optimize%20Database
+	 * @return	array
 	 */
-	function _optimize_table($table)
+	public function list_databases()
 	{
-		// No SQL based support in CUBRID as of version 8.4.1. Database or
-		// table optimization can be performed using CUBRID Manager
-		// database administration tool. See the link above for more info.
-		return FALSE;
+		if (isset($this->db->data_cache['db_names']))
+		{
+			return $this->db->data_cache['db_names'];
+		}
+
+		return $this->db->data_cache['db_names'] = cubrid_list_dbs($this->db->conn_id);
 	}
 
 	// --------------------------------------------------------------------
 
-	/**
-	 * Repair table query
-	 *
-	 * Generates a platform-specific query so that a table can be repaired
-	 *
-	 * @access	private
-	 * @param	string	the table name
-	 * @return	object
-	 * @link 	http://www.cubrid.org/manual/840/en/Checking%20Database%20Consistency
-	 */
-	function _repair_table($table)
-	{
-		// Not supported in CUBRID as of version 8.4.1. Database or
-		// table consistency can be checked using CUBRID Manager
-		// database administration tool. See the link above for more info.
-		return FALSE;
-	}
-
-	// --------------------------------------------------------------------
 	/**
 	 * CUBRID Export
 	 *
-	 * @access	private
 	 * @param	array	Preferences
 	 * @return	mixed
 	 */
-	function _backup($params = array())
+	protected function _backup($params = array())
 	{
 		// No SQL based support in CUBRID as of version 8.4.1. Database or
 		// table backup can be performed using CUBRID Manager

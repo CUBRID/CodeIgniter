@@ -247,10 +247,30 @@ adding::
 
 	 $config['display_pages'] = FALSE;
 
-******************************
-Adding a class to every anchor
-******************************
+****************************
+Adding attributes to anchors
+****************************
 
-If you want to add a class attribute to every link rendered by the
-pagination class, you can set the config "anchor_class" equal to the
-classname you want.
+If you want to add an extra attribute to be added to every link rendered
+by the pagination class, you can set them as key/value pairs in the
+"attributes" config
+
+::
+
+	// Produces: class="myclass"
+	$config['attributes'] = array('class' => 'myclass');
+
+.. note:: Usage of the old method of setting classes via "anchor_class"
+	is deprecated.
+
+*****************************
+Disabling the "rel" attribute
+*****************************
+
+By default the rel attribute is dynamically generated and appended to
+the appropriate anchors. If for some reason you want to turn it off,
+you can pass boolean FALSE as a regular attribute
+
+::
+
+	$config['attributes']['rel'] = FALSE;

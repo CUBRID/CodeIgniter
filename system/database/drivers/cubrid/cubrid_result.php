@@ -2,12 +2,12 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.1.6 or newer
+ * An open source application development framework for PHP 5.2.4 or newer
  *
  * NOTICE OF LICENSE
- * 
+ *
  * Licensed under the Open Software License version 3.0
- * 
+ *
  * This source file is subject to the Open Software License (OSL 3.0) that is
  * bundled with this package in the files license.txt / license.rst.  It is
  * also available through the world wide web at this URL:
@@ -39,7 +39,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	/**
 	 * Number of rows in the result set
 	 *
-	 * @return	integer
+	 * @return	int
 	 */
 	public function num_rows()
 	{
@@ -51,7 +51,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	/**
 	 * Number of fields in the result set
 	 *
-	 * @return	integer
+	 * @return	int
 	 */
 	public function num_fields()
 	{
@@ -84,23 +84,20 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	public function field_data()
 	{
 		$retval = array();
-		$colIdx = 0;
+		$i = 0;
 
-		while ($field = @cubrid_fetch_field($this->result_id))
+		while ($field = cubrid_fetch_field($this->result_id))
 		{
-			$F		= new stdClass();
-			$F->name		= $field->name;
-			// CUBRID returns type as varchar(100) for example,
-			// that's why we need to remove all brackets and digits.
-			$F->type		= preg_replace('/[\d()]/', '', $field->type);
-			$F->default	= $field->def == '' ? NULL : $field->def;
-			// use CUBRID's native API to obtain column's max_length,
-			// otherwise $field->max_length returns incorrect info.
-			// See #150.
-			$F->max_length  = cubrid_field_len($this->result_id, $colIdx++);
-			$F->primary_key = $field->primary_key;
-
-			$retval[] = $F;
+			$retval[$i]			= new stdClass();
+			$retval[$i]->name		= $field->name;
+			// CUBRID returns type as e.g. varchar(100),
+			// so we need to remove all digits and brackets.
+			$retval[$i]->type		= preg_replace('/[\d()]/', '', $field->type);
+			$retval[$i]->default		= $field->def;
+			// Use CUBRID's native API to obtain column's max_length,
+			// otherwise $field->max_length has incorrect info
+			$retval[$i]->max_length		= cubrid_field_len($this->result_id, $i);
+			$retval[$i++]->primary_key	= $field->primary_key;
 		}
 
 		return $retval;
@@ -111,13 +108,12 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	/**
 	 * Free the result
 	 *
-	 * @return	null
+	 * @return	void
 	 */
 	public function free_result()
 	{
-		if(is_resource($this->result_id) ||
-			get_resource_type($this->result_id) == "Unknown" &&
-			preg_match('/Resource id #/', strval($this->result_id)))
+		if (is_resource($this->result_id) OR
+			(get_resource_type($this->result_id) === 'Unknown' && preg_match('/Resource id #/', strval($this->result_id))))
 		{
 			cubrid_close_request($this->result_id);
 			$this->result_id = FALSE;
@@ -133,7 +129,7 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	 * this internally before fetching results to make sure the
 	 * result set starts at zero
 	 *
-	 * @return	array
+	 * @return	bool
 	 */
 	protected function _data_seek($n = 0)
 	{
@@ -169,7 +165,6 @@ class CI_DB_cubrid_result extends CI_DB_result {
 	}
 
 }
-
 
 /* End of file cubrid_result.php */
 /* Location: ./system/database/drivers/cubrid/cubrid_result.php */
